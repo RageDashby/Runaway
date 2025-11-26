@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Runaway - Endless Run</title>
+    <!--Hoja de estilos-->
+    <link rel="stylesheet" href="css/style.css">
+    <!--Font Awesome-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+</head>
+<body>
+    <!--Viewport-->
+    <main id="app-container" class="full-screen">
+    <!--Inicio de sesion-->
+        <section id="auth-screen" class="full-screen">
+            <div class="auth-box neon-accent">
+                <h1>RUNAWAY</h1>
+                <p style="color:#bbb; margin-top:-10px; margin-bottom:18px;">El túnel espera</p>
+                <!--Requisitos de inicio-->
+                <form id="login-form">
+                    <input type="email" id="login-email" placeholder="Correo" required>
+                    <input type="password" id="login-pass" placeholder="Contraseña" required>
+                    <button type="submit" class="neon-accent"><i class="fas fa-play"></i> Iniciar Sesión</button>
+                    <p style="margin-top:20px; font-size:0.9rem;">¿No tienes cuenta? <span id="go-to-register" style="color:var(--neon-color); cursor:pointer; text-decoration:underline;">Regístrate</span></p>
+                </form>
+
+                <form id="register-form" class="hidden">
+                    <input type="text" id="reg-name" placeholder="Usuario" required>
+                    <input type="email" id="reg-email" placeholder="Correo" required>
+                    <input type="password" id="reg-pass" placeholder="Contraseña" required>
+                    
+                    <div style="margin: 15px 0; text-align:left; width:100%; display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <div>
+                            <label style="color:#bbb; font-size:0.8rem; display:block;">Nave (Principal)</label>
+                            <div style="display:flex; align-items:center; gap:5px;">
+                                <input type="color" id="reg-color-primary" value="#00ff00" style="height:35px; padding:0; border:none; width:100%;">
+                            </div>
+                        </div>
+                        <div>
+                            <label style="color:#bbb; font-size:0.8rem; display:block;">Túnel (Secundario)</label>
+                            <div style="display:flex; align-items:center; gap:5px;">
+                                <input type="color" id="reg-color-secondary" value="#ff00ff" style="height:35px; padding:0; border:none; width:100%;">
+                            </div>
+                        </div>
+                    </div>
+                    <!--Botones-->
+                    <button type="submit" class="neon-accent"><i class="fas fa-user-plus"></i> Registrar</button>
+                    <p style="margin-top:20px;">¿Ya tienes cuenta? <span id="go-to-login" style="color:var(--neon-color); cursor:pointer; text-decoration:underline;">Inicia Sesión</span></p>
+                </form>
+            </div>
+        </section>
+        <!--UI Sidebar-->
+        <section id="game-ui" class="hidden">
+            <aside class="sidebar neon-accent">
+                <div class="logo-area" style="padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.04);">
+                    <h2>RUNAWAY</h2>                 
+                </div>
+                <!--Selector de dificultad-->
+                <div style="margin-top:18px; display:flex; flex-direction:column; gap:10px;">
+                    <label style="color:#aaa; font-size:0.8rem;">Dificultad:</label>
+                    <select id="difficulty-select" class="neon-input">
+                        <option value="easy">Fácil</option>
+                        <option value="normal" selected>Normal</option>
+                        <option value="hard">Difícil</option>
+                    </select>
+                    <!--Boton de perfil-->
+                    <button id="btn-restart-game" class="neon-accent"><i class="fas fa-refresh"></i></button>
+                    <button id="btn-profile" class="neon-accent"><i class="fas fa-user"></i> Perfil</button>
+                </div>
+                <!--Controles y boton de salir-->
+                <div style="margin-top:auto; display:flex; flex-direction:column; gap:10px;">
+                    <div style="padding:10px; color:#aaa; font-size:0.9rem; text-align:center;">Controles: W A S D</div>
+                    <div style="padding:10px; color:#aaa; font-size:0.9rem; text-align:center;">Controles:Esc para ver perfil</div>
+                    <button id="btn-logout" class="neon-accent"><i class="fas fa-sign-out-alt"></i> Cerrar Sesion</button>
+                </div>
+            </aside>
+            <!--Juego y Canvas-->
+            <div class="main-content">
+                <div class="hud" aria-hidden="true">
+                    <!--Puntaje y Vide de la partida-->
+                    <div id="hud-score" class="neon-accent" style="padding:8px 12px; border-radius:10px;">Puntaje: 0</div>
+                    <div id="hud-lives" class="neon-accent" style="padding:8px 12px; border-radius:10px; color:#ff6b6b;">❤❤❤</div>
+                </div>
+                <!--Canva-->
+                <div class="canvas-wrap" style="display:flex; align-items:center; justify-content:center; width:100%; height:100%;">
+                    <canvas id="game-canvas" width="800" height="600"></canvas>
+                </div>
+                
+                <div style="position:absolute; bottom:24px; display:flex; gap:12px;">
+                    <button id="btn-end-attempt" class="neon-accent" style="opacity:0.9; font-size:0.9rem;">Terminar Intento</button>
+                </div>
+            </div>
+            <!--Perfil de usuario-->
+            <div id="profile-modal" class="modal hidden">
+                <div class="modal-content neon-accent wide-modal"> <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h3 style="margin:0;">Perfil de Usuario</h3>
+                        <button id="close-profile" style="background:transparent; border:none; color:var(--neon-color); font-size:1.2rem; cursor:pointer;">✕</button>
+                    </div>
+                    <!--Cambiar colores y Nombre de usuario-->
+                    <div class="profile-grid">
+                        <div class="profile-left">
+                            <label style="color:#888; font-size:0.9rem;">Nombre</label>
+                            <input type="text" id="edit-name">
+                            
+                            <label style="color:#888; font-size:0.8rem; margin-top:15px; display:block;">Colores</label>
+                            <div style="display:flex; gap:10px; margin-top:5px;">
+                                <div style="flex:1;">
+                                    <small style="color:#666;">Nave</small>
+                                    <input type="color" id="edit-color-primary" style="height:35px; padding:0; width:100%;">
+                                </div>
+                                <div style="flex:1;">
+                                    <small style="color:#666;">Ambiente</small>
+                                    <input type="color" id="edit-color-secondary" style="height:35px; padding:0; width:100%;">
+                                </div>
+                            </div>
+                            
+                            <button id="save-profile" class="neon-accent" style="width:100%; margin-top:20px;">Guardar Cambios</button>
+                        </div>
+                        <!--Selector de dificuktad-->
+                        <div class="profile-right">
+                            <h4 style="margin-top:0; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">Historial de Partidas</h4>
+                            <div class="table-container">
+                                <table id="history-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Dificultad</th>
+                                            <th>Puntaje</th>
+                                            <th>Fecha</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="history-body">
+                                        </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Place holder par amensaje-->
+            <div id="custom-modal" class="modal hidden">
+                <div class="modal-content neon-accent" style="max-width:300px;">
+                    <h3 id="modal-title">Mensaje</h3>
+                    <p id="modal-message" style="color:#ddd; margin: 15px 0;">...</p>
+                    <div id="modal-actions" style="display:flex; justify-content:center; gap:10px;">
+                        </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+    
+    <div id="toast-container"></div>
+    <!--Script de modulos-->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
